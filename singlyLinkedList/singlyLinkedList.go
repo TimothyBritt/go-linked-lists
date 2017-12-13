@@ -1,6 +1,6 @@
 package singlyLinkedList
 
-import "linked_lists/nodes"
+import "go-linked-lists/nodes"
 
 // Storing the length on the lists uses extra memory, but can give us the flexibility to
 // perform additional operations on the lists.
@@ -86,14 +86,76 @@ func (s *SinglyLinkedList) InsertBefore(inserted *nodes.SinglyLinkedNode, before
 		//Otherwise, loop through the nodes until we find the node BEFORE the before node:
 		currentNode := s.head
 		for currentNode != nil && currentNode.Next != nil && currentNode.Next != before {
-			// this is the node before the "before" node, step currentNode to the next node
 			currentNode = currentNode.Next
 		}
 
+		// the currentNode is now in front of the "before" node.
 		if currentNode.Next == before {
+			// point the next pointer of the inserted node to the "before" node
 			inserted.Next = before
+			// then point the next pointer of the currentNode to the inserted node
 			currentNode.Next = inserted
+			// the node has been successfully inserted into the list
 			s.length++
+		}
+	}
+}
+
+func (s *SinglyLinkedList) InsertAfter(inserted *nodes.SinglyLinkedNode, after *nodes.SinglyLinkedNode) {
+	// If the head is the pointer to the "after" node, then point the next pointer of the
+	// inserted node to the head's next pointer and then point the next pointer of the
+	// head to the inserted node
+	if s.head == after {
+		inserted.Next = s.head.Next
+		s.head.Next = inserted
+	} else {
+		currentNode := s.head.Next
+		// Otherwise find the "after" node
+		for currentNode != nil && currentNode.Next != nil && currentNode != after {
+			currentNode = currentNode.Next
+		}
+
+		// the currentNode is now the "after" node.
+		if currentNode == after {
+			// point the next pointer of the inserted node to the currentNode's next pointer
+			inserted.Next = currentNode.Next
+			// point the next pointer of the currentNode to the inserted node
+			currentNode.Next = inserted
+			// the node has successfully been inserted into the list
+			s.length++
+		}
+	}
+}
+
+func (s *SinglyLinkedList) Reverse() *SinglyLinkedList {
+	reversedList := new(SinglyLinkedList).Init()
+	currentNode := s.head
+
+	for currentNode != nil {
+		reversedList.Prepend(currentNode)
+		currentNode = currentNode.Next
+		reversedList.length++
+	}
+
+	return reversedList
+}
+
+func (s *SinglyLinkedList) Delete(deleted *nodes.SinglyLinkedNode) {
+	if s.head == deleted {
+		s.head = s.head.Next
+		deleted.Next = nil
+		s.length--
+	} else {
+		currentNode := s.head.Next
+		for currentNode != nil && currentNode.Next != deleted {
+			currentNode = currentNode.Next
+		}
+
+		// the currentNode is before the node marked for deletion
+		if currentNode.Next == deleted {
+			currentNode.Next = deleted.Next
+			deleted.Next = nil
+			s.length--
 		}
 	}
 }
